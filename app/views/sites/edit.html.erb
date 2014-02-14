@@ -1,0 +1,6 @@
+<h4>Edit: <%=@site.url %> for the LinkChecker</h4>
+
+<%= form_for :site, url: "/sites/#{@site.id}", method: :patch do |f| %>
+  <%= f.text_field :url, value: @site.url %>
+  <%= f.submit "Update URL" %>
+<% end %> 

@@ -22,3 +22,10 @@
   	<td><%= link_to url, url %></td><td>A Search Engine with a bad link</td>
   </tr>
 </table>
+
+<% @sites.each do |s| %>
+  <%= s.url %>
+  <% s.links.each do |l| %>
+    <%= l.url %>
+  <% end %>
+<% end %>

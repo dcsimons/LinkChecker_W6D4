@@ -61,22 +61,75 @@ describe "Sites" do
 	end
 
 	describe "GET /sites/:id/edit" do
-		it 'is successful with HTML'
-		it 'is a 404 with JSON'
+		before do
+			@site = Site.create!(:url => "www.example-link.com")
+		end
+		it 'is successful with HTML' do
+			get "/sites/#{@site.id}/edit"
+			response.should be_success
+		end	
+
+		it 'is a 404 with JSON' do
+			get "/sites/#{@site.id}/edit.json"
+			response.code.should == "404"
+		end
 	end
 
 	describe "GET /sites/new" do
-		it 'is successful with HTML'
-		it 'is a 404 with JSON'
+		
+		it 'is successful with HTML' do
+			get "/sites/new"
+			response.should be_success
+		end
+
+		it 'is a 404 with JSON' do
+			get "/sites/new.json"
+			response.code.should == "404"
+		end
 	end
 
 	describe "GET /linkfarm/" do
-		it 'gets the links with HTML'
-		it 'gets the links with JSON'
+		before do
+			@site1 = Site.create!(:url => "www.example-link.com")
+			@site2 = Site.create!(:url => "www.links-here.com")
+			@site1.links.create!(url: "www.example1.com", http_response: "200")
+			@site1.links.create!(url: "www.example2.com", http_response: "200")
+			@site2.links.create!(url: "www.link1.com", http_response: "200")
+			@site2.links.create!(url: "www.link2.com", http_response: "200")
+		end
+		it 'gets the links with HTML' do
+			get "/linkfarm"
+			response.should be_success
+			@site1.links.each do |l|
+				response.body.should include(l.url)
+			end
+			@site2.links.each do |l|
+				response.body.should include(l.url)
+			end
+		end
+
+		it 'gets the links with JSON' do
+			get "/linkfarm.json"
+			response.should be_success
+			result = JSON.parse(response.body)
+			result.each do |r|
+				r["links"].should_not == nil
+			end
+		end
 	end
 
 	describe "DELETE /sites/:id" do
-		it 'succeeds and redirects with HTML'
-		it 'succeeds and does not redirect with JSON'
+		before do
+			@site = Site.create!(:url => "www.example-link.com")
+		end
+		it 'succeeds and redirects with HTML' do
+			delete "/sites/#{@site.id}"
+			response.code.should == "302"
+			response.should redirect_to new_site_path
+		end
+		it 'succeeds and does not redirect with JSON' do
+			delete "/sites/#{@site.id}.json"
+			response.should be_success
+		end
 	end
 end
